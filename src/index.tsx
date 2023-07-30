@@ -4,9 +4,9 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import Juego from './components/files/Juego';
 import 'bootswatch/dist/pulse/bootstrap.min.css';
 import Navbar from './components/navbar/Navbar';
+import FileUpload from './components/juegos/FileUpload';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -19,7 +19,7 @@ root.render(
 
       <div className="container p-4">
         <Routes>
-          <Route path="/" Component={Juego}/>
+          <Route path="/" Component={FileUpload}/>
         </Routes>  
       </div>
 
