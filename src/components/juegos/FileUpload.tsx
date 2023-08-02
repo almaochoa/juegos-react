@@ -4,17 +4,7 @@ let content:any;
 let errores: string = "";
 let resps: string = "";
 
-function writeFile(player1:number, player2:number){
-
-    let winner = "";
-    let points = 0;
-    if(player1 > player2){
-      winner = "1";
-      points = player1;
-    } else {
-      winner = "2";
-      points = player2;
-    }
+function writeFile(winner:string, points:number){
       
     let txtResp = winner + " " + points;
     const a = document.createElement("a");
@@ -28,73 +18,86 @@ function writeFile(player1:number, player2:number){
   }      
 
 function processFile(){
-   
+
+  let puntos;
+  let player1 = 0;
+  let player2 = 0;
+  let pos = 0;
+  let acumj1 = 0;
+  let acumj2 = 0;
+  let ventaja = 0;
+  let jugador = "";
+  let mayorVentaja = 0;
+  let jugadorVentaja = "";
+
     //si el archivo tiene contenido
     if(content){
 
       //toma las lineas del archivo
       let lines = content.split('\n');
       let num_rondas = Number.parseInt(lines[0]);
-      let puntos;
-      let player1 = 0;
-      let player2 = 0;
-      let pos = 0;
 
-      if(num_rondas < 10000){
+      if(Number.isNaN(Number.parseInt(lines[0]))){
+        errores = 'El valor de numeros de ronda no es un numero';
+      } else {         
 
-        if(lines.length == num_rondas+1){
-          
-          for(let i=1; i<lines.length; i++){
+        if(num_rondas <= 10000){
 
-            //si encuntra un salto de linea
-            if(lines[i].indexOf('\r') > 0){
+          if(lines.length == num_rondas+1){
+            
+            for(let i=1; i<lines.length; i++){
+
+              //si encuentra un salto de linea
+              if(lines[i].indexOf('\r') > 0){
                 pos = lines[i].indexOf('\r');
                 lines[i] = lines[i].substring(0,pos);
-            }
+              }
 
-            puntos = lines[i].split(' ');
-            //valida que sean numeros los que estan en el archivo
-            if(Number.isNaN(Number.parseInt(puntos[0]))){
-              errores = `El valor del jugador 1 de la ronda ${i} no es un numero`;
-              break;    
-            }
-            if(Number.isNaN(Number.parseInt(puntos[1]))){
-              errores = `El valor del jugador 2 de la ronda ${i} no es un numero`;    
-              break;    
-            }
+              puntos = lines[i].split(' ');
+              //valida que sean numeros los que estan en el archivo
+              if(Number.isNaN(Number.parseInt(puntos[0]))){
+                errores = `El valor del jugador 1 de la ronda ${i} no es un numero`;
+                break;    
+              }
+              if(Number.isNaN(Number.parseInt(puntos[1]))){
+                errores = `El valor del jugador 2 de la ronda ${i} no es un numero`;    
+                break;    
+              }
 
-            puntos[0] = Number.parseInt(puntos[0]);
-            puntos[1] = Number.parseInt(puntos[1]);
+              puntos[0] = Number.parseInt(puntos[0]);
+              puntos[1] = Number.parseInt(puntos[1]);
 
-            if(puntos[0] > puntos[1]){//ronda ganada por jugador 1
-              if(player1 < puntos[0]-puntos[1])
-                player1 = puntos[0]-puntos[1];
-            } else {//ronda ganada por jugador 2
-                if(puntos[1] > puntos[0]){
-                  if(player2 < puntos[1] - puntos[0])
-                    player2 = puntos[1] - puntos[0];
-                } else {//empate
-                  if(player1 < puntos[0]-puntos[1])
-                    player1 = puntos[0]-puntos[1];
-                  if(player2 < puntos[1]-puntos[0])
-                    player2 = puntos[1]-puntos[0];
-                }    
-              } 
+              acumj1 += puntos[0];
+              acumj2 += puntos[1];
+
+              if(acumj1 > acumj2){
+                ventaja = acumj1-acumj2;
+                jugador = "1";
+              } else if(acumj2 > acumj1) {
+                  ventaja = acumj2-acumj1;
+                  jugador = "2";
+              }
+              
+              if(mayorVentaja < ventaja){
+                mayorVentaja = ventaja;
+                jugadorVentaja = jugador;   
+              }   
+              
+            }  
+              
+          } else {
+            errores = 'Faltan datos de rondas';
           }  
-
-
-        } else {//no existen todas las rondas en el archivo
-          errores = 'Faltan datos de rondas';
+        } else {
+          errores = "No puede haber mas de 10000 rondas";        
         }
 
-      } else {
-        errores = "No puede haber mas de 10000 rondas";        
-      }
+      }  
 
       if(errores != ""){
         resps = "";
       } else {
-        writeFile(player1, player2);
+        writeFile(jugadorVentaja, mayorVentaja);
         alert("El archivo con el resultado ha sido descargado");
         window.location.reload()
     
